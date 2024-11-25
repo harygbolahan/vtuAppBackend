@@ -24,6 +24,7 @@ const purchaseData = async (req, res) => {
         const { error } = validatePurchaseData({ network, amount, phoneNumber });
         if (error) return res.status(400).json({ message: error.message });
 
+
         // Fetch user's wallet and check walletBalance
         const userWallet = await walletService.getUserWallet(userId);
         if (!userWallet || userWallet.walletBalance < amount) {
@@ -48,6 +49,7 @@ const purchaseData = async (req, res) => {
             amount,
             response: "",
             status: "initialised",
+            description: `${amount} ${networkName} ${networkType} Data Purchase for ${phoneNumber}`
         });
 
         // Deduct amount from wallet

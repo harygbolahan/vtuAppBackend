@@ -19,6 +19,9 @@ const dataSchema = new mongoose.Schema(
       required: true,
       // enum: ["MTN", "GLO", "AIRTEL", "9MOBILE"],
     },
+    description: {
+      type: String
+    },
     type: {
       type: String,
       required: true,
