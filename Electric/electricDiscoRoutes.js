@@ -1,7 +1,7 @@
 const express = require('express');
-const electricDiscoController = require('../controllers/electricDiscoController');
-const electricController = require('../controllers/electricController')
-const authMiddleware = require('../middleware/auth');
+const electricDiscoController = require('./electricDiscoController');
+const electricController = require('./electricController')
+const authMiddleware = require('../Auth/authMiddleware');
 const router = express.Router();
 
 router.route('/').post(electricDiscoController.fetchAllElectricDisco);

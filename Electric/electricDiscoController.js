@@ -1,6 +1,6 @@
-const Electric = require('../models/electricDiscoModel');
+const Electric = require('./electricDiscoModel');
 
-const electricDiscoService = require('../services/electricDiscoService');
+const electricDiscoService = require('./electricDiscoService');
 
 //Fetch all electric disco
 

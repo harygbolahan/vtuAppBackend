@@ -1,5 +1,5 @@
-const CablePlan = require('../models/cablePlanModel');
-const cableplanService = require('../services/cablePlanService');
+const CablePlan = require('./cablePlanModel');
+const cableplanService = require('./cablePlanService');
 
 // Get all cable plans
 const getAllCablePlans = async (req, res) => {

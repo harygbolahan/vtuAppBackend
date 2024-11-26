@@ -1,14 +1,14 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user");
-const dataRoutes = require("./routes/data");
-const airtimeRoutes = require("./routes/airtime");
-const dataPlanRoutes = require("./routes/dataPlans");
-const cableRoutes = require("./routes/cable");
-const cablePlanRoutes = require("./routes/cablePlans");
-const electricDiscoRoutes = require("./routes/electricDisco");
+const authRoutes = require('./Auth/authRoutes')
+const userRoutes = require("./User/userRoutes");
+const dataRoutes = require("./Data/dataRoutes");
+const airtimeRoutes = require("./Airtime/airtimeRoutes");
+const dataPlanRoutes = require("./Data/dataPlansRoutes");
+const cableRoutes = require("./Cable/cableRoutes");
+const cablePlanRoutes = require("./Cable/cablePlansRoutes");
+const electricDiscoRoutes = require("./Electric/electricDiscoRoutes");
 require('dotenv').config();
 
 // const productRoutes = require("./routes/product");
@@ -64,7 +64,7 @@ app.use("/api/v1/electricDisco", electricDiscoRoutes)
 app.all("*", (req, res) => {
   res.status(404).json({
     status: "fail",
-    message: `Can't find ${req.originalUrl} with meth ${req.method} on this server. Route not defined`,
+    message: `Can't find ${req.originalUrl} with method ${req.method} on this server. Route not defined`,
   });
 });
 

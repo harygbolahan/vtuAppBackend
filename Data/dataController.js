@@ -1,13 +1,12 @@
-const DataTransaction = require('../models/dataModel');
-const dataService = require('../services/dataService');
+const DataTransaction = require('./dataModel');
+const dataService = require('./dataService');
 const walletService = require('../services/walletServices');
-const AirtimeTransaction = require('../models/airtimeModel');
+const AirtimeTransaction = require('../Airtime/airtimeModel');
 const { Types } = require('mongoose');
 
 
-const { validatePurchaseData } = require('../validations/dataPurchaseValidation');
-const DataPlan = require('../models/dataPlansModel');
-const { response } = require('../app');
+const { validatePurchaseData } = require('./dataPurchaseValidation');
+const DataPlan = require('./dataPlansModel');
 
 
 // {network: '1', networkType: 'SME', plan: '118', phoneNumber: '08038295877', pin: '5555'}

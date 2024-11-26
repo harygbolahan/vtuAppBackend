@@ -1,6 +1,6 @@
-const Users = require("./../models/user");
+const Users = require("../User/userModels");
 const jwt = require("jsonwebtoken");
-const AppError = require("./../utils/AppError");
+const AppError = require("../utils/AppError");
 
 const protectRoute = async (req, res, next) => {
   try {

@@ -1,8 +1,8 @@
-const CableTransaction = require('../models/cableModel');
-const cableService = require('../services/cableService');
+const CableTransaction = require('./cableModel');
+const cableService = require('./cableService');
 const walletService = require('../services/walletServices');
 const { Types } = require('mongoose');
-const cableValidations = require('../validations/cableValidations');
+const cableValidations = require('./cableValidations');
 
 
 const verifyCableIUC = async (req, res) => {

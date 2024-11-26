@@ -1,6 +1,6 @@
 const express = require('express');
-const airtimeController = require('../controllers/airtimeController')
-const authMiddleware = require('../middleware/auth')
+const airtimeController = require('./airtimeController')
+const authMiddleware = require('../Auth/authMiddleware')
 const router = express.Router();
 
 router.route('/purchase').post(authMiddleware.protectRoute, airtimeController.purchaseAirtime)

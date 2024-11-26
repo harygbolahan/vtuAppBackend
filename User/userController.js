@@ -1,7 +1,7 @@
 // const users = require("./../data/user");
 const bcrypt = require("bcryptjs");
-const Users = require("./../models/user");
-const AppError = require("./../utils/AppError");
+const Users = require("./userModels");
+const AppError = require("../utils/AppError");
 const { dataUri } = require("../utils/multer");
 const { uploader } = require("../utils/cloudinary");
 

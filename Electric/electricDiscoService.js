@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const ElectricDisco = require("../models/electricDiscoModel");
+const ElectricDisco = require("./electricDiscoModel");
 
 const MERRYBILL_URL = process.env.MERRYBILL_URL;
 const MERRYBILL_API_KEY = process.env.MERRYBILL_API_KEY;

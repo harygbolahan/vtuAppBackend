@@ -1,6 +1,6 @@
 const express = require('express');
-const cableController = require('../controllers/cableController')
-const authMiddleware = require('../middleware/auth')
+const cableController = require('./cableController')
+const authMiddleware = require('../Auth/authMiddleware')
 const router = express.Router();
 
 router.route('/verify-iuc').post(authMiddleware.protectRoute, cableController.verifyCableIUC)

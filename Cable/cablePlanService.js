@@ -1,5 +1,5 @@
 const axios = require('axios');
-const CablePlan = require('../models/cablePlanModel');
+const CablePlan = require('./cablePlanModel');
 
 const AUTO_PILOT_URL = process.env.AUTO_PILOT_URL;
 AUTO_PILOT_API_KEY = process.env.AUTO_PILOT_API_KEY;

@@ -1,7 +1,7 @@
 // routes/dataRoutes.js
 const express = require('express');
-const dataController = require('../controllers/dataController');
-const authMiddleware = require('../middleware/auth'); // Assuming you have an auth middleware
+const dataController = require('./dataController');
+const authMiddleware = require('../Auth/authMiddleware'); // Assuming you have an auth middleware
 
 const router = express.Router();
 

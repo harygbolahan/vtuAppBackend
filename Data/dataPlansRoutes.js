@@ -1,6 +1,6 @@
 const express = require('express');
-const dataPlanController = require('../controllers/dataPlanController')
-const authMiddleware = require('../middleware/auth')
+const dataPlanController = require('./dataPlanController')
+const authMiddleware = require('../Auth/authMiddleware')
 const router = express.Router();
 
 router.route('/').get(authMiddleware.protectRoute, dataPlanController.fetchAllDataPlans);

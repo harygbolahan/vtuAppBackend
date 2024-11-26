@@ -1,11 +1,11 @@
-const Users = require("./../models/user");
+const Users = require("../User/userModels");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const signJWt = require("./../utils/SignJwt");
-const sendEmail = require("./../utils/Email");
+const signJWt = require("../utils/SignJwt");
+const sendEmail = require("../utils/Email");
 const crypto = require("crypto");
 const AppError = require("../utils/AppError");
-const { validateUserSignup } = require("./../validations/userValidations");
+const { validateUserSignup } = require("../User/userValidations");
 
 const signup = async (req, res, next) => {
   try {

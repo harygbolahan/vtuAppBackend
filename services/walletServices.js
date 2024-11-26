@@ -1,6 +1,6 @@
 // services/walletService.js
 const mongoose = require("mongoose");
-const Users = require("../models/user");
+const Users = require("../User/userModels");
 const Wallet = require("../models/walletModel"); // Assume a Wallet model
 
 exports.getUserWallet = async (userId) => {

@@ -1,8 +1,8 @@
-const AirtimeTransaction = require('../models/airtimeModel');
-const airtimeService = require('../services/airtimeService');
+const AirtimeTransaction = require('./airtimeModel');
+const airtimeService = require('./airtimeService');
 const walletService = require('../services/walletServices');
 const {Types} = require('mongoose');
-const {airtimePurchaseValidation} = require('../validations/airtimePurchaseValidation')
+const {airtimePurchaseValidation} = require('./airtimePurchaseValidation')
 
 const purchaseAirtime = async (req, res) => {
     try {

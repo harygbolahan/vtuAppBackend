@@ -1,5 +1,5 @@
 const axios = require('axios');
-const DataPlan = require('../models/dataPlansModel'); // Import the DataPlan model
+const DataPlan = require('./dataPlansModel'); // Import the DataPlan model
 
 const DATAHOUSE_API_URL = process.env.DATAHOUSE_PLAN_URL;
 const DATAHOUSE_API_KEY = process.env.DATAHOUSE_API_KEY;

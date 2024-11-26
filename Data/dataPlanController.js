@@ -1,5 +1,5 @@
-const DataPlan = require('../models/dataPlansModel');
-const dataPlanService = require('../services/dataPlanService');
+const DataPlan = require('./dataPlansModel');
+const dataPlanService = require('./dataPlanService');
 
 const fetchAllDataPlans = async (req, res) => {
     try {

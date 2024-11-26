@@ -1,6 +1,6 @@
-const Electric = require('../models/electricModel');
+const Electric = require('./electricModel');
 const walletService = require('../services/walletServices');
-const electricService = require('../services/electricService');
+const electricService = require('./electricService');
 
 
 
