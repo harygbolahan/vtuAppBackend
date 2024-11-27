@@ -9,10 +9,33 @@ const contractCode = process.env.MONNIFY_CONTRACT_CODE;
 
 
 exports.bvnDetails = async (req, res) => {
+
+  //get User ID
+
+  const userId = req.user._id;
+
+  console.log('request', req.user);
+  
+
+  console.log('Req', req.body);
+  
   const { bvn, name, dateOfBirth, mobileNo } = req.body;
 
   try {
     const result = await verifyBVNDetails(bvn, name, dateOfBirth, mobileNo);
+
+    //Save to User in DB
+
+    const user = await User.findByIdAndUpdate(userId, { 
+      bvn: bvn, 
+      kycStatus: 'verified',
+      isVerified: true
+    
+    }, { new: true });
+
+    console.log('User', user);
+    
+
     return res.status(200).json({ success: true, data: result.responseBody });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -20,10 +43,23 @@ exports.bvnDetails = async (req, res) => {
 };
 
 exports.ninDetails = async (req, res) => {
+
+  const userId = req.user._id;
+
   const { nin } = req.body;
 
   try {
     const result = await verifyNIN(nin);
+
+    const user = await User.findByIdAndUpdate(userId, { 
+      nin: nin, 
+      kycStatus: 'verified',
+      isVerified: true
+    
+    }, { new: true });
+
+    console.log('User', user);
+
     return res.status(200).json({ success: true, data: result.responseBody });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
