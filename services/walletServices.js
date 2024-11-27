@@ -68,3 +68,27 @@ exports.refundAmount = async (userId, amount) => {
     }
   };
 
+
+exports.fundAmount = async (userId, amount) => {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new Error("Invalid user ID");
+      }
+
+      const wallet = await Users.findById(userId); // Use userId directly
+
+      if (!wallet) {
+        throw new Error("Wallet not found"); // Handle if wallet is not found
+      }
+
+      // ... rest of the fund logic
+      wallet.walletBalance = +amount + wallet.walletBalance 
+      await wallet.save();
+
+    } catch (error) {
+      console.error("Fund error:", error.message);
+      throw new Error("Wallet Funding could not be processed.");
+    }
+    
+}
+

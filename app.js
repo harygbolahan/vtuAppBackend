@@ -1,7 +1,11 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const authRoutes = require('./Auth/authRoutes')
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+require('dotenv').config();
+
+const authRoutes = require('./Auth/authRoutes');
 const userRoutes = require("./User/userRoutes");
 const dataRoutes = require("./Data/dataRoutes");
 const airtimeRoutes = require("./Airtime/airtimeRoutes");
@@ -9,29 +13,30 @@ const dataPlanRoutes = require("./Data/dataPlansRoutes");
 const cableRoutes = require("./Cable/cableRoutes");
 const cablePlanRoutes = require("./Cable/cablePlansRoutes");
 const electricDiscoRoutes = require("./Electric/electricDiscoRoutes");
-require('dotenv').config();
 
-// const productRoutes = require("./routes/product");
-// const authRoutes = require("./routes/auth");
-// const jobRoutes = require("./routes/jobs");
-// const companyRoutes = require("./routes/company");
-// const errorHandler = require("./middleware/error");
-// const { cloudinaryConfig } = require("./utils/cloudinary");
+// Import Payvessel Webhook Handler
+const { handlePayvesselWebhook } = require('./webhooks/payvesselWebhook');
+const { handleBillstackWebhook } = require('./webhooks/billstackWebhook');
+const monnifyRoutes = require("./Monnify/monnifyRoutes");
+
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware
+app.use(helmet());
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(morgan("dev"));
-// app.use(cors("*"));
-// app.use(cors({
-//   origin: 'http://localhost:5173', // Replace this with your frontend's URL
-//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//   credentials: true // Allow cookies to be sent from the client if needed
-// }));
-
 app.use(cors());
 
-// app.use("*", cloudinaryConfig);
+// Rate Limiter
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000, // 1 hour
+  message: "Too many requests from this IP, please try again later.",
+});
+app.use("/api", limiter);
+
+// Routes
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "success",
@@ -48,19 +53,23 @@ app.get("/api/v1", (req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/data", dataRoutes)
-app.use("/api/v1/airtime", airtimeRoutes)
-app.use("/api/v1/dataPlans", dataPlanRoutes)
-app.use("/api/v1/cable", cableRoutes)
-app.use("/api/v1/cablePlans", cablePlanRoutes)
-app.use("/api/v1/electricDisco", electricDiscoRoutes)
+app.use("/api/v1/data", dataRoutes);
+app.use("/api/v1/airtime", airtimeRoutes);
+app.use("/api/v1/dataPlans", dataPlanRoutes);
+app.use("/api/v1/cable", cableRoutes);
+app.use("/api/v1/cablePlans", cablePlanRoutes);
+app.use("/api/v1/electricDisco", electricDiscoRoutes);
+
+// Payvessel Webhook Route
+app.post('/api/v1/payvessel-webhook', handlePayvesselWebhook);
 
 
+// BillStack Webhook Route
+app.post('/api/v1/billstack-webhook', handleBillstackWebhook);
 
-// app.use("/api/v1/products", productRoutes);
-// app.use("/api/v1/jobs", jobRoutes);
-// app.use("/api/v1/company", companyRoutes);
+app.use('/api/v1/monnify', monnifyRoutes);
 
+// 404 Route Not Found
 app.all("*", (req, res) => {
   res.status(404).json({
     status: "fail",
@@ -68,8 +77,13 @@ app.all("*", (req, res) => {
   });
 });
 
-
-// Calling our error handler
-// app.use(errorHandler);
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    status: "error",
+    message: "Something went wrong on the server.",
+  });
+});
 
 module.exports = app;
