@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+// const rateLimit = require("express-rate-limit");
 require('dotenv').config();
 
 const authRoutes = require('./Auth/authRoutes');
@@ -23,18 +23,18 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+// app.use(express.json({ limit: "10kb" }));
+// app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(morgan("dev"));
 app.use(cors());
 
 // Rate Limiter
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000, // 1 hour
-  message: "Too many requests from this IP, please try again later.",
-});
-app.use("/api", limiter);
+// const limiter = rateLimit({
+//   max: 100,
+//   windowMs: 60 * 60 * 1000, // 1 hour
+//   message: "Too many requests from this IP, please try again later.",
+// });
+// app.use("/api", limiter);
 
 // Routes
 app.get("/", (req, res) => {
