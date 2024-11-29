@@ -4,8 +4,7 @@ const authMiddleware = require('../Auth/authMiddleware');
 
 const router = express.Router();
 
-// Endpoint to reserve a customer account
-router.post('/reserve-account', createVirtualAccount);
+router.route('/reserve-account').post(authMiddleware.protectRoute, createVirtualAccount)
 
 router.route('/bvn-details').post(authMiddleware.protectRoute, bvnDetails);
 
