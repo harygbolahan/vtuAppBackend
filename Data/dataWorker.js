@@ -3,11 +3,20 @@ const walletService = require('../services/walletServices');
 const dataService = require('./dataService');
 const DataTransaction = require('./dataModel');
 
+// const redisConfig = {
+//     host: process.env.REDIS_HOST || '127.0.0.1',
+//     port: process.env.REDIS_PORT || 6379,
+//     maxRetriesPerRequest: null,
+// };
+
+//REDIS CONFIG WITH EXTERNAL URL
+
 const redisConfig = {
-    host: process.env.REDIS_HOST || '127.0.0.1',
-    port: process.env.REDIS_PORT || 6379,
+    url: process.env.REDIS_URL,
     maxRetriesPerRequest: null,
 };
+
+
 
 const worker = new Worker(
     'dataPurchaseQueue',
