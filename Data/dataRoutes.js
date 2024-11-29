@@ -11,6 +11,8 @@ router.route('/purchase').post(authMiddleware.protectRoute, dataController.purch
 // Get a single data transaction by ID
 router.route('/:id').get(authMiddleware.protectRoute, dataController.getDataTransactionById);
 
+router.route('/status/:jobId').get(authMiddleware.protectRoute, dataController.getStatus)
+
 // Get all data transactions
 router.route('/').get(authMiddleware.protectRoute, dataController.getAllDataTransactions);
 

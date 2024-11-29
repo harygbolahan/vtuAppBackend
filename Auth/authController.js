@@ -142,6 +142,53 @@ const login = async (req, res, next) => {
   }
 };
 
+// const login = async (req, res, next) => {
+//   try {
+//     const { email, password } = req.body;
+//     if (!email || !password) {
+//       throw new Error("Please provide email and password");
+//     }
+
+//     // Find user by email and include the password field
+//     const user = await Users.findOne({ email }).select("+password");
+//     if (!user) {
+//       throw new Error("Invalid email or password");
+//     }
+
+//     // Validate password
+//     const isPasswordValid = await user.comparePassword(password);
+//     if (!isPasswordValid) {
+//       throw new Error("Invalid email or password");
+//     }
+
+//     // Generate a unique session ID
+//     const sessionId = crypto.randomUUID();
+
+//     // Save the session ID in the user's document
+//     user.currentSession = sessionId;
+//     await user.save();
+
+//     // Generate JWT with the session ID included
+//     const token = signJWt({ userId: user._id, sessionId });
+
+//     // Return the token and user info
+//     res.status(200).json({
+//       status: "success",
+//       message: "User logged in successfully",
+//       data: {
+//         user,
+//         token,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(404).json({
+//       status: "fail",
+//       message: error.message,
+//     });
+//   }
+// };
+
 const verifyEmailAddress = async (req, res, next) => {
   try {
     const { email, verificationToken } = req.params;

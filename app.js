@@ -69,6 +69,25 @@ app.post('/api/v1/billstack-webhook', handleBillstackWebhook);
 
 app.use('/api/v1/monnify', monnifyRoutes);
 
+app.get('api/v1/data/status/:jobId', async (req, res) => {
+  const { jobId } = req.params;
+  try {
+    const job = await purchaseQueue.getJob(jobId);
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    const status = await job.getState(); // e.g., 'waiting', 'active', 'completed', 'failed'
+    const result = status === 'completed' ? await job.returnvalue : null;
+
+    res.status(200).json({ status, result });
+  } catch (error) {
+    console.error(`Error fetching job status: ${error.message}`);
+    res.status(500).json({ message: 'Failed to fetch job status' });
+  }
+});
+
+
 // 404 Route Not Found
 app.all("*", (req, res) => {
   res.status(404).json({
