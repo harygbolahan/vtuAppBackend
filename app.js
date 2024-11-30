@@ -4,7 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 // const rateLimit = require("express-rate-limit");
 require('dotenv').config();
-
+const monnifyWebhook = require("./webhooks/monnifyWebhook")
 const authRoutes = require('./Auth/authRoutes');
 const userRoutes = require("./User/userRoutes");
 const dataRoutes = require("./Data/dataRoutes");
@@ -68,6 +68,19 @@ app.post('/api/v1/payvessel-webhook', handlePayvesselWebhook);
 app.post('/api/v1/billstack-webhook', handleBillstackWebhook);
 
 app.use('/api/v1/monnify', monnifyRoutes);
+
+app.use((req, res, next) => {
+  const allowedIPs = ['35.242.133.146'];
+  const requestIP = req.ip || req.connection.remoteAddress;
+  if (!allowedIPs.includes(requestIP)) {
+    return res.status(403).send('Unauthorized IP');
+  }
+  next();
+});
+
+
+app.use('/webhook', monnifyWebhook);
+
 
 app.get('api/v1/data/status/:jobId', async (req, res) => {
   const { jobId } = req.params;
