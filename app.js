@@ -79,7 +79,7 @@ app.use('/api/v1/monnify', monnifyRoutes);
 // });
 
 
-app.use('/webhook', monnifyWebhook);
+// app.use('/webhook', monnifyWebhook);
 
 
 app.get('api/v1/data/status/:jobId', async (req, res) => {

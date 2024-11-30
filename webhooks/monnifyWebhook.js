@@ -7,7 +7,7 @@ const router = express.Router();
 // Replace with your Monnify client secret
 const MONNIFY_CLIENT_SECRET = process.env.MONNIFY_API_SECRET
 
-router.post('/monnify', async (req, res) => {
+exports.handleMonnifyWebhook = async (req, res) => {
   try {
     const requestBody = req.body;
 
@@ -58,6 +58,5 @@ router.post('/monnify', async (req, res) => {
     console.error('Error processing webhook:', error);
     res.status(500).send('Server error');
   }
-});
+};
 
-module.exports = router;
