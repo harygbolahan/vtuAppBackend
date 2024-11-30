@@ -69,14 +69,14 @@ app.post('/api/v1/billstack-webhook', handleBillstackWebhook);
 
 app.use('/api/v1/monnify', monnifyRoutes);
 
-app.use((req, res, next) => {
-  const allowedIPs = ['35.242.133.146'];
-  const requestIP = req.ip || req.connection.remoteAddress;
-  if (!allowedIPs.includes(requestIP)) {
-    return res.status(403).send('Unauthorized IP');
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   const allowedIPs = ['35.242.133.146'];
+//   const requestIP = req.ip || req.connection.remoteAddress;
+//   if (!allowedIPs.includes(requestIP)) {
+//     return res.status(403).send('Unauthorized IP');
+//   }
+//   next();
+// });
 
 
 app.use('/webhook', monnifyWebhook);
