@@ -14,6 +14,10 @@ const cableRoutes = require("./Cable/cableRoutes");
 const cablePlanRoutes = require("./Cable/cablePlansRoutes");
 const electricDiscoRoutes = require("./Electric/electricDiscoRoutes");
 
+//Admin routes
+
+const adminAuthRoutes = require("./Admin/routes/adminAuthRoutes");
+
 // Import Payvessel Webhook Handler
 const { handlePayvesselWebhook } = require('./webhooks/payvesselWebhook');
 const { handleBillstackWebhook } = require('./webhooks/billstackWebhook');
@@ -51,6 +55,9 @@ app.get("/api/v1", (req, res) => {
   });
 });
 
+
+app.use("/api/v1/administrator/auth", adminAuthRoutes)
+
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/data", dataRoutes);
@@ -62,7 +69,6 @@ app.use("/api/v1/electricDisco", electricDiscoRoutes);
 
 // Payvessel Webhook Route
 app.post('/api/v1/payvessel-webhook', handlePayvesselWebhook);
-
 
 // BillStack Webhook Route
 app.post('/api/v1/billstack-webhook', handleBillstackWebhook);
@@ -103,11 +109,14 @@ app.get('api/v1/data/status/:jobId', async (req, res) => {
 
 // 404 Route Not Found
 app.all("*", (req, res) => {
+
   res.status(404).json({
     status: "fail",
-    message: `Can't find ${req.originalUrl} with method ${req.method} on this server. Route not defined`,
+    message: `Can't find ${req.originalUrl} with method ${req.method} on this server. Route not defined. `,
   });
 });
+
+
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

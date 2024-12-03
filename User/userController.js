@@ -88,14 +88,14 @@ const updateProfilePicture = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   const userId = req.user._id;
   try {
-    const user = await Users.findById(userId);
+    const user = await Users.findById(userId).select("-bankDetails");
     if (!user) {
       throw new AppError(`User not found with id of ${userId}`, 404);
     }
 
     const allowedFields = [
       "firstName", "lastName", "middleName", "address",
-      "gender", "dateOfBirth", "bankDetails"
+      "gender", "dateOfBirth",
     ];
 
     const fieldsToUpdate = Object.keys(req.body);
@@ -254,6 +254,74 @@ const updateAllUserData = async (req, res, next) => {
   }
 }
 
+//get total user wallet
+
+const getTotalUserWallet = async (req, res, next) => {
+  try {
+    const totalUserWallet = await Users.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalWallet: { $sum: "$walletBalance" },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      message: "Total user wallet retrieved successfully",
+      data: {
+        totalUserWallet,
+      },
+    });
+  } catch (error) {
+    next(error);
+      }
+}
+
+//getTotal verified users and unverified users
+
+const getTotalVerifiedAndUnverifiedUsers = async (req, res, next) => {
+  try {
+    const totalVerifiedUsers = await Users.countDocuments({ isVerified: true });
+    const totalUnverifiedUsers = await Users.countDocuments({ isVerified: false });
+
+    res.status(200).json({
+      status: "success",
+      message: "Total verified and unverified users retrieved successfully",
+      data: {
+        totalVerifiedUsers,
+        totalUnverifiedUsers,
+      },
+    });
+  } catch (error) {
+    next(error);
+
+      }
+}
+
+//fetch all Transactions by all users
+
+const fetchAllTransactionsByAllUsers = async (req, res, next) => {
+  try {
+    const transactions = await Transactions.find().populate("user", "firstName lastName email");
+    res.status(200).json({
+      status: "success",
+      message: "Transactions retrieved successfully",
+      data: {
+        transactions,
+      },
+    });
+  } catch (error) {
+    next(error);
+      }
+      
+}
+
+
+
+
+
 
 module.exports = {
   getAllUsers,
@@ -263,5 +331,7 @@ module.exports = {
   updateUserStatus,
   setUserPassword,
   getUserByEmail,
-  updateAllUserData
+  updateAllUserData,
+  getTotalUserWallet,
+  getTotalVerifiedAndUnverifiedUsers,
 };
