@@ -38,6 +38,7 @@ const signup = async (req, res, next) => {
       phoneNumber,
       password: hashedPassword,
       role,
+      status: 'inactive'
     });
 
     if (!user) {

@@ -22,7 +22,7 @@ exports.deductAmount = async (userId, amount) => {
           throw new Error("Invalid user ID");
       }
 
-      const wallet = await Users.findById(userId);
+      const wallet = await Users.findById(userId).select("walletBalance"); // Use userId directly
       if (!wallet) {
           throw new Error("Wallet not found");
       }
@@ -51,8 +51,7 @@ exports.refundAmount = async (userId, amount) => {
 
       console.log(userId, 'userId');
       
-      const wallet = await Users.findById(userId); // Use userId directly
-  
+      const wallet = await Users.findById(userId).select("walletBalance"); // Use userId directly
       if (!wallet) {
         throw new Error("Wallet not found"); // Handle if wallet is not found
       }

@@ -8,7 +8,7 @@ const { uploader } = require("../utils/cloudinary");
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await Users.find();
+    const users = await Users.find().select("+transaction_pin");
 
     if (!users) {
       throw new AppError("No users found", 404);

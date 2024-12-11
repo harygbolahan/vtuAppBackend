@@ -1,4 +1,4 @@
-const DataTransaction = require('./dataModel');
+const DataTransaction = require('../models/generalModel');
 const dataService = require('./dataService');
 const walletService = require('../services/walletServices');
 const AirtimeTransaction = require('../Airtime/airtimeModel');
@@ -9,141 +9,23 @@ const purchaseQueue = require('./dataQueue');
 const { validatePurchaseData } = require('./dataPurchaseValidation');
 const DataPlan = require('./dataPlansModel');
 
-
-// {network: '1', networkType: 'SME', plan: '118', phoneNumber: '08038295877', pin: '5555'}
-
-// const purchaseData = async (req, res) => {
-//     try {
-//         const { network, networkType, phoneNumber, pin, plan, amount } = req.body.formData;
-//         const userId = req.user.id;
-
-//         // Log incoming request
-//         console.log('Request Payload:', { network, networkType, phoneNumber, pin, plan, amount, userId });
-
-//         // Validate input data
-//         const { error } = validatePurchaseData({ network, amount, phoneNumber });
-//         if (error) return res.status(400).json({ message: error.message });
-
-
-//         // Fetch user's wallet and check walletBalance
-//         const userWallet = await walletService.getUserWallet(userId);
-//         if (!userWallet || userWallet.walletBalance < amount) {
-//             return res.status(400).json({ message: "Insufficient wallet balance" });
-//         }
-
-//         // Network mapping for readability and extensibility
-//         const networkMap = {
-//             '1': 'MTN',
-//             '2': 'GLO',
-//             '3': '9MOBILE',
-//             '4': 'AIRTEL',
-//         };
-//         const networkName = networkMap[network] || 'UNKNOWN';
-
-//         // Create initial data transaction record
-//         const dataTransaction = await DataTransaction.create({
-//             userID: userId,
-//             network,
-//             type: networkType,
-//             phoneNumber,
-//             amount,
-//             response: "",
-//             status: "initialised",
-//             description: `${amount} ${networkName} ${networkType} Data Purchase for ${phoneNumber}`
-//         });
-
-//         // Deduct amount from wallet
-//         try {
-//             const debitWallet = await walletService.deductAmount(userId, amount);
-//             console.log('Wallet Deduct Payload', userId, amount);
-
-//             if (!debitWallet) {
-//                 throw new Error("Wallet deduction failed");
-//             }
-//         } catch (walletError) {
-//             console.error("Wallet deduction error:", walletError);
-//             return res.status(500).json({ message: "Failed to deduct amount from wallet." });
-//         }
-
-//         // Call external API for data purchase
-//         try {
-//             const apiResponse = await dataService.purchaseDataFromExternalAPI({
-//                 network,
-//                 mobile_number: phoneNumber,
-//                 plan,
-//                 Ported_number: true,
-//             });
-
-//             console.log('API Response:', apiResponse);
-
-//             // Check if the transaction was successful
-//             if (!apiResponse || !apiResponse.success) {
-//                 throw new Error(apiResponse.api_response || "Data purchase failed with no detailed response");
-//             }
-
-//             // Update transaction record and finalize response
-//             dataTransaction.status = "success";
-//             dataTransaction.externalTransactionId = apiResponse.data?.transaction_id || null;
-//             dataTransaction.previousBalance = userWallet.walletBalance;
-//             dataTransaction.newBalance = userWallet.walletBalance - +amount;
-//             dataTransaction.response = apiResponse.api_response;
-//             dataTransaction.cashBack = 0; // Placeholder for cashback logic
-//             dataTransaction.discount = 0; // Placeholder for discount logic
-//             await dataTransaction.save();
-
-//             return res.status(200).json({
-//                 message: "Data purchase successful",
-//                 transaction: {
-//                     id: dataTransaction._id,
-//                     network: networkName,
-//                     phoneNumber,
-//                     amount,
-//                     response: dataTransaction.response,
-//                     previousBalance: dataTransaction.previousBalance,
-//                     newBalance: dataTransaction.newBalance,
-//                     cashback: dataTransaction.cashBack,
-//                     discount: dataTransaction.discount,
-//                 },
-//             });
-//         } catch (apiError) {
-//             console.error("External API error:", apiError);
-
-//             // Mark transaction as failed with the error response
-//             dataTransaction.status = "failed";
-//             dataTransaction.response = apiError.message || apiError.response?.data?.api_response || "Unknown error";
-//             await dataTransaction.save();
-
-//             // Refund wallet in case of failure
-//             try {
-//                 await walletService.refundAmount(userId, amount);
-//                 return res.status(500).json({
-//                     message: "Data purchase failed; refund issued.",
-//                     error: dataTransaction.response,
-//                 });
-//             } catch (refundError) {
-//                 console.error("Refund error:", refundError.message);
-//                 return res.status(500).json({
-//                     message: "Data purchase failed; refund could not be processed. Please contact support.",
-//                     error: refundError.message,
-//                 });
-//             }
-//         }
-//     } catch (error) {
-//         console.error("Purchase data error:", error);
-//         res.status(500).json({
-//             message: "Data purchase failed due to server error.",
-//             error: error.message || error,
-//         });
-//     }
-// };
-
 const purchaseData = async (req, res) => {
     try {
         const { network, networkType, phoneNumber, pin, plan, amount } = req.body.formData;
         const userId = req.user.id;
 
+
         // Log incoming request
         console.log('Enqueuing purchase:', { network, networkType, phoneNumber, pin, plan, amount, userId });
+
+        //Validate PIn
+
+        if (pin !== req.user.transaction_pin) {
+            console.log('Invalid PIN');
+
+            return res.status(401).json({ message: "Invalid PIN" });
+            
+        }
 
         // Validate input data
         const { error } = validatePurchaseData({ network, amount, phoneNumber });
@@ -201,10 +83,6 @@ const getStatus = async (req, res) => {
         return res.status(500).json({ status: 'fail', message: 'Failed to retrieve job status' });
     }
 };
-
-
-
-
 
 // Get single data transaction by ID
 const getDataTransactionById = async (req, res) => {

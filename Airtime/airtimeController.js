@@ -1,4 +1,4 @@
-const AirtimeTransaction = require('./airtimeModel');
+const Transaction = require('../models/generalModel');
 const airtimeService = require('./airtimeService');
 const walletService = require('../services/walletServices');
 const {Types} = require('mongoose');
@@ -9,8 +9,12 @@ const purchaseAirtime = async (req, res) => {
 
         console.log('Payload', req.body.formData);
         
-        const {network, type, amount, phoneNumber} = req.body.formData;
+        const {network, type, amount, phoneNumber, pin} = req.body.formData;
         const userId = req.user._id;
+
+        if (pin !== req.user.transaction_pin){
+            return res.status(400).json({ message: 'Invalid transaction pin' });
+        }
 
         const {error} = airtimePurchaseValidation({network, type, amount, phoneNumber});
         if (error) return res.status(400).json({ message: error.message });
@@ -21,12 +25,15 @@ const purchaseAirtime = async (req, res) => {
             return res.status(400).json({ message: 'Insufficient balance' });
         }
 
-        const airtimeTransaction = await AirtimeTransaction.create({
+        const airtimeTransaction = await Transaction.create({
             userID: userId,
+            user: req.user,
             network,
             type,
             amount,
+            serviceType: 'Airtime',
             phoneNumber,
+            description: `Purchase of ${network} ${type} ${amount} airtime for ${phoneNumber}`,
             response: "",
             status: 'initialised'
         })

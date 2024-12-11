@@ -50,7 +50,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       minlength: [4, 'Transaction pin must not be less than 4 digits'],
       maxlength: [4, 'Transaction pin must not be greater than 4 digits'],
-      select: false,
     },
     kycStatus: {
       type: String,
@@ -97,7 +96,7 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'inactive'],
+      enum: ['active', 'inactive', 'suspended'],
     },
     createdAt: {
       type: Date,

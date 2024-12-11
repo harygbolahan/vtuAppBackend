@@ -17,6 +17,7 @@ const electricDiscoRoutes = require("./Electric/electricDiscoRoutes");
 //Admin routes
 
 const adminAuthRoutes = require("./Admin/routes/adminAuthRoutes");
+const adminWalletRoutes = require("./Admin/routes/adminWalletRoutes")
 
 // Import Payvessel Webhook Handler
 const { handlePayvesselWebhook } = require('./webhooks/payvesselWebhook');
@@ -57,6 +58,7 @@ app.get("/api/v1", (req, res) => {
 
 
 app.use("/api/v1/administrator/auth", adminAuthRoutes)
+app.use("/api/v1/administrator/wallet", adminWalletRoutes)
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);

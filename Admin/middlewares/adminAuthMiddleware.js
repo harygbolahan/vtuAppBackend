@@ -1,6 +1,6 @@
-const Users = require("../User/userModels");
+const Users = require("../../User/userModels");
 const jwt = require("jsonwebtoken");
-const AppError = require("../utils/AppError");
+const AppError = require("../../utils/AppError");
 
 const protectRoute = async (req, res, next) => {
   try {
@@ -13,6 +13,8 @@ const protectRoute = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(' ')[1];
     }
+
+    console.log('Token', token)
 
     // Check if the token is missing
     if (!token) {
@@ -37,19 +39,31 @@ const protectRoute = async (req, res, next) => {
     console.log("Protect route Error", error);
     
       if (error.name === 'JsonWebTokenError') {
-      return next(new AppError('Invalid token, please log in again', 401));
+
+        return res.status(401).json({
+          status: "fail",
+          message: "Invalid token, please log in again",
+        })
+
+      // return next(new AppError('Invalid token, please log in again', 401));
     }
 
     if (error.name === 'TokenExpiredError') {
-      return next(new AppError('Your token has expired, please log in again', 401));
+      return res.status(401).json({
+        status: "fail",
+        message: "Token expired, please log in again",
+      })
     }
 
     // Generic error fallback
-    return next(error);
+    // return next(error);
   }
 };
 
 const verifyIsAdmin = async (req, res, next) => {
+
+  // console.log('req user', req.user);
+  
   try {
     if (req.user.role !== "admin") {
       throw new Error(
