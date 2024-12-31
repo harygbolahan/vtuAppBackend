@@ -4,6 +4,7 @@ const walletService = require('../services/walletServices');
 const AirtimeTransaction = require('../Airtime/airtimeModel');
 const { Types } = require('mongoose');
 const purchaseQueue = require('./dataQueue');
+const services = require('../Admin/models/servicesManagement')
 
 
 const { validatePurchaseData } = require('./dataPurchaseValidation');
@@ -14,10 +15,40 @@ const purchaseData = async (req, res) => {
         const { network, networkType, phoneNumber, pin, plan, amount } = req.body.formData;
         const userId = req.user.id;
 
+        
 
         // Log incoming request
         console.log('Enqueuing purchase:', { network, networkType, phoneNumber, pin, plan, amount, userId });
 
+            const isGeneralAvailable = await services.isAvailable();
+            console.log(`General availability: ${isGeneralAvailable}`); // true or false
+
+
+        if (!isGeneralAvailable) {
+            return res.status(403).json({ message: "All services is not available at the moment. Please try again later." });
+        }
+
+
+        // Check if the network is available
+
+        console.log('Network', plan.network)
+        const isNetworkAvailable = await services.isAvailable(plan.network);
+        console.log(`Network availability: ${isNetworkAvailable}`); // true or false
+
+        if (!isNetworkAvailable) {
+            return res.status(403).json({ error: error.message });
+        }
+
+        //check if network type is available
+
+        const isNetworkTypeAvailable = await services.isAvailable(plan.network, networkType);
+        console.log('network type', networkType);
+        
+        console.log(`Network type availability: ${isNetworkTypeAvailable}`); // true or false
+
+        if (!isNetworkTypeAvailable) {
+            return res.status(403).json({ message: "This network type is not available at the moment. Please try again later." });
+        }
         //Validate PIn
 
         if (pin !== req.user.transaction_pin) {

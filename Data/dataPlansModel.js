@@ -2,9 +2,45 @@ const mongoose = require('mongoose');
 
 // Define the schema for a single data plan
 const dataPlanSchema = new mongoose.Schema({
-  planId: {
-    type: String,
-    required: true,
+  autoPilot: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
+  },
+  ogdams: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
+  },
+  autoSync: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
+  },
+  datahouse: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
+  },
+  bwsub: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
+  },
+  husmoData: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
+  },
+  ayinlak: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
+  },
+  gladtidings: {
+    networkId: { type: String, required: false },
+    planId: { type: String, required: false },
+    providerPrice: { type: Number, required: false },
   },
   network: {
     type: String,
@@ -14,13 +50,17 @@ const dataPlanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  originalPrice: {
+  userPrice: {
     type: Number,
-    required: true,
   },
-  improvedPrice: {
+  resellerPrice: {
     type: Number,
-    required: true,
+  },
+  agentPrice: {
+    type: Number,
+  },
+  apiPrice: {
+    type: Number,
   },
   dataSize: {
     type: String,
@@ -37,24 +77,17 @@ const dataPlanSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
-  }
+  },
 });
 
-// Define the schema for a collection of data plans grouped by provider
 const providerPlansSchema = new mongoose.Schema({
   provider: {
-    type: String,
-    required: true,
+      type: String,
+      required: true,
   },
-  allPlans: [
-    {
-      provider: String,
-      plans: [dataPlanSchema], // Array of data plans for each provider
-    },
-  ],
+  allPlans: [dataPlanSchema], 
 });
 
-// Create a model for provider data plans
 const DataPlan = mongoose.model('DataPlan', providerPlansSchema);
 
 module.exports = DataPlan;
