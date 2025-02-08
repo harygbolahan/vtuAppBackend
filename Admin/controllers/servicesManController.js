@@ -97,26 +97,44 @@ exports.setNetworkTypeStatus = async (req, res) => {
 //           name: 'MTN',
 //           status: 'enabled',
 //           types: [
-//             { typeName: 'MTN SME', status: 'enabled' },
-//             { typeName: 'MTN Gifting', status: 'enabled' },
+//             { typeName: 'SME', status: 'enabled' },
+//             { typeName: 'Gifting', status: 'enabled' },
+//             { typeName: 'Corporate', status: 'enabled' },
+//             { typeName: 'Awoof', status: 'enabled' },
 //           ],
 //         },
 //         {
 //           name: 'Glo',
 //           status: 'enabled',
 //           types: [
-//             { typeName: 'Glo Corporate Gifting', status: 'enabled' },
+//             { typeName: 'CORPORATE', status: 'enabled' },
+//             { typeName: 'Gifting', status: 'enabled' },
+//             { typeName: 'SME', status: 'enabled' },
+//             { typeName: 'Awoof', status: 'enabled' },
+
 //           ],
 //         },
 //         {
 //           name: 'Airtel',
 //           status: 'enabled',
-//           types: [],
+//           types: [
+//             { typeName: 'CORPORATE', status: 'enabled' },
+//             { typeName: 'Gifting', status: 'enabled' },
+//             { typeName: 'SME', status: 'enabled' },
+//             { typeName: 'Awoof', status: 'enabled' },
+
+//           ],
 //         },
 //         {
 //           name: 'Mobile',
 //           status: 'enabled',
-//           types: [],
+//           types: [
+//             { typeName: 'CORPORATE', status: 'enabled' },
+//             { typeName: 'Gifting', status: 'enabled' },
+//             { typeName: 'SME', status: 'enabled' },
+//             { typeName: 'Awoof', status: 'enabled' },
+
+//           ],
 //         },
 //       ],
 //     };

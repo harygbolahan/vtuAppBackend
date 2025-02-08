@@ -4,14 +4,6 @@ const dataService = require('./dataService');
 const Transaction = require('../models/generalModel');
 const Users = require('../User/userModels');
 
-// const redisConfig = {
-//     host: process.env.REDIS_HOST || '127.0.0.1',
-//     port: process.env.REDIS_PORT || 6379,
-//     maxRetriesPerRequest: null,
-// };
-
-//REDIS CONFIG WITH EXTERNAL URL
-
 const redisConfig = {
     url: process.env.REDIS_URL,
     maxRetriesPerRequest: null,
@@ -26,7 +18,7 @@ const worker = new Worker(
 
         const user = await Users.findById(userId);
         console.log('User', user);
-        
+
 
         try {
             console.log(`Processing job ${job.id} for User: ${userId}`);
@@ -44,7 +36,7 @@ const worker = new Worker(
             const apiResponse = await dataService.purchaseDataFromExternalAPI({
                 network,
                 mobile_number: phoneNumber,
-                plan,
+                plan: plan.datahouse.planId,
                 Ported_number: true,
             });
 
@@ -56,27 +48,6 @@ const worker = new Worker(
                 await walletService.refundAmount(userId, amount);
                 throw new Error(apiResponse.api_response || 'Unknown error from external API');
             }
-
-            //Case to match network to network name. e.g network 1 to MTN
-
-            // let networkName = '';
-
-            // switch (network) {
-            //     case 1:
-            //         networkName = 'MTN';
-            //         break;
-            //     case 2:
-            //         networkName = 'GLO';
-            //         break;
-            //     case 3:
-            //         networkName = '9mobile';
-            //         break;
-            //     case 4:
-            //         networkName = 'AIRTEL';
-            //         break;
-            //     default:
-            //         networkName = 'Unknown';
-            // }
 
             // Step 4: Log transaction as successful
             await Transaction.create({

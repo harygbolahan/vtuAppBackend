@@ -94,7 +94,7 @@ servicesManagementSchema.statics.isAvailable = async function (networkName, type
 
     // Find network
     const network = data.networks.find(
-      (n) => n.name === networkName.trim()
+      (n) => n.name === networkName.trim().toLowerCase()
     );
 
     if (!network || network.status === 'disabled') {
@@ -108,20 +108,12 @@ servicesManagementSchema.statics.isAvailable = async function (networkName, type
 
     // Find specific service type
     const type = network.types.find(
-      (t) => t.typeName === typeName.trim()
+      (t) => t.typeName === typeName.trim().toLowerCase()
     );
 
     if (!type || type.status === 'disabled') {
       return false;
     }
-
-    // // Check maintenance mode
-    // if (type.maintenanceMode.isActive) {
-    //   const now = new Date();
-    //   if (!type.maintenanceMode.scheduledEndTime || type.maintenanceMode.scheduledEndTime > now) {
-    //     return false;
-    //   }
-    // }
 
     return true;
   } catch (error) {

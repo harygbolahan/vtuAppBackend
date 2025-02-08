@@ -2,8 +2,8 @@ const AppError = require("./../utils/AppError");
 
 // Duplicate value in mongoDB
 const handleDuplicateError = (err) => {
-  const dupKey = Object.keys(err.keyValue)[0]; //title
-  const dupValue = Object.values(err.keyValue)[0]; //bata yahoo loo
+  const dupKey = Object.keys(err.keyValue)[0]; 
+  const dupValue = Object.values(err.keyValue)[0]; 
   console.log(dupValue);
   const message = `${dupKey} with value "${dupValue}"  exist already`;
   return new AppError(message, 400);

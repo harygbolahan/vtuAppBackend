@@ -232,6 +232,11 @@ const updateAllUserData = async (req, res, next) => {
   const userId = req.params.id;
   const user = req.body;
 
+  console.log({
+    "UserID": userId,
+    "User Data": user,
+  });
+
   try {
     const updatedUser = await Users.findByIdAndUpdate(userId, user, { new: true });
     if (!updatedUser) {

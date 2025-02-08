@@ -1,93 +1,77 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-// Define the schema for a single data plan
-const dataPlanSchema = new mongoose.Schema({
-  autoPilot: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  ogdams: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  autoSync: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  datahouse: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  bwsub: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  husmoData: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  ayinlak: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  gladtidings: {
-    networkId: { type: String, required: false },
-    planId: { type: String, required: false },
-    providerPrice: { type: Number, required: false },
-  },
-  network: {
+// Schema for provider-specific details
+const providerDetailsSchema = new mongoose.Schema({
+  provider: {
     type: String,
     required: true,
+    enum: ["autoPilot", "ogdams", "datahouse", "bwsub", "husmo", "ayinlak", "gladtidings"],
   },
-  planName: {
-    type: String,
+  providerPrice: {
+    type: mongoose.Schema.Types.Decimal128,
     required: true,
   },
-  userPrice: {
-    type: Number,
-  },
-  resellerPrice: {
-    type: Number,
-  },
-  agentPrice: {
-    type: Number,
-  },
-  apiPrice: {
-    type: Number,
-  },
-  dataSize: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-  },
-  validity: {
-    type: String,
-    required: true,
-  },
-  description: {
+  providerPlanId: {
     type: String,
     required: true,
   },
 });
 
-const providerPlansSchema = new mongoose.Schema({
-  provider: {
+// Main Data Plan Schema
+const dataPlanSchema = new mongoose.Schema(
+  {
+    network: {
       type: String,
       required: true,
+      enum: ["MTN", "AIRTEL", "GLO", "9MOBILE"],
+    },
+    planName: {
+      type: String,
+      required: true,
+    },
+    dataSize: {
+      value: { type: Number, required: true }, // e.g., 1
+      unit: { type: String, required: true, enum: ["MB", "GB", "TB"] }, // e.g., "GB"
+    },
+    type: {
+      type: String,
+      enum: ["SME", "CORPORATE", "GIFTING"],
+    },
+    validity: {
+      value: { type: Number, required: true }, // e.g., 30
+      unit: { type: String, required: true, enum: ["hours", "days", "weeks"] }, // e.g., "days"
+    },
+    description: {
+      type: String,
+    },
+    providers: [providerDetailsSchema], // Array of provider-specific details
+    userPrice: {
+      type: mongoose.Schema.Types.Decimal128,
+      required: true,
+    },
+    resellerPrice: mongoose.Schema.Types.Decimal128,
+    agentPrice: mongoose.Schema.Types.Decimal128,
+    apiPrice: mongoose.Schema.Types.Decimal128,
   },
-  allPlans: [dataPlanSchema], 
+  { timestamps: true }
+);
+
+// Indexes for faster queries
+dataPlanSchema.index({ network: 1, planName: 1 }); // For filtering by network and plan name
+dataPlanSchema.index({ "providers.provider": 1 }); // For filtering by provider
+
+// Hide internal fields in API responses
+dataPlanSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    ret.providers = ret.providers.map((provider) => ({
+      provider: provider.provider,
+      providerPrice: provider.providerPrice.toString(), // Convert Decimal128 to string
+      providerPlanId: provider.providerPlanId,
+    }));
+    return ret;
+  },
 });
 
-const DataPlan = mongoose.model('DataPlan', providerPlansSchema);
+const DataPlan = mongoose.model("DataPlan", dataPlanSchema);
 
 module.exports = DataPlan;

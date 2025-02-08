@@ -3,8 +3,14 @@ const dataPlanController = require('./dataPlanController')
 const authMiddleware = require('../Auth/authMiddleware')
 const router = express.Router();
 
-router.route('/').get(authMiddleware.protectRoute, dataPlanController.fetchAllDataPlans);
+router.route('/').get(dataPlanController.getAllPlans);
 
-router.route('/plans').get( dataPlanController.fetchAllDataPlans);
+router.route('/add').post(authMiddleware.protectRoute, dataPlanController.addPlan);
+
+router.route('/delete').delete(authMiddleware.protectRoute, dataPlanController.deletePlan);
+
+
+
+// router.route('/plans').get( dataPlanController.fetchAllDataPlans);
 
 module.exports = router;

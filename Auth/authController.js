@@ -106,6 +106,7 @@ const signup = async (req, res, next) => {
   }
 };
 
+// Function to Login user
 const login = async (req, res, next) => {
   try {
 

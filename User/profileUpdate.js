@@ -66,7 +66,7 @@ const updateProfileSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ['male', 'female', 'other'],
+      enum: ['male', 'female',],
     },
     dateOfBirth: {
       type: Date,
@@ -97,7 +97,7 @@ const updateProfileSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'inactive'],
+      enum: ['active', 'inactive', 'suspended'],
     },
     createdAt: {
       type: Date,
