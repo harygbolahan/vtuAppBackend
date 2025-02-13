@@ -5,6 +5,7 @@ const AirtimeTransaction = require('../Airtime/airtimeModel');
 const { Types } = require('mongoose');
 const purchaseQueue = require('./dataQueue');
 const services = require('../Admin/models/servicesManagement')
+const providers = require('../Admin/models/providerModel')
 
 
 const { validatePurchaseData } = require('./dataPurchaseValidation');
@@ -15,54 +16,60 @@ const purchaseData = async (req, res) => {
         const { network, networkType, phoneNumber, pin, plan, amount } = req.body.formData;
         const userId = req.user.id;
 
-        
-
         // Log incoming request
         console.log('Enqueuing purchase:', { network, networkType, phoneNumber, pin, plan, amount, userId });
-
-            const isGeneralAvailable = await services.isAvailable();
-            console.log(`General availability: ${isGeneralAvailable}`); // true or false
-
-
+        console.log('Providers', plan.providers);
+        
+        // Check general availability of services
+        const isGeneralAvailable = await services.isAvailable();
+        console.log(`General availability: ${isGeneralAvailable}`);
         if (!isGeneralAvailable) {
             return res.status(403).json({ message: "All services is not available at the moment. Please try again later." });
         }
 
-
         // Check if the network is available
-
-        console.log('Network', plan.network)
+        console.log('Network', plan.network);
         const isNetworkAvailable = await services.isAvailable(plan.network);
-        console.log(`Network availability: ${isNetworkAvailable}`); // true or false
-
+        console.log(`Network availability: ${isNetworkAvailable}`);
         if (!isNetworkAvailable) {
-            return res.status(403).json({ error: error.message });
+            return res.status(403).json({ message: "Network is not available at the moment." });
         }
 
-        //check if network type is available
-
+        // Check if the network type is available
+        console.log('Network type', networkType);
         const isNetworkTypeAvailable = await services.isAvailable(plan.network, networkType);
-        console.log('network type', networkType);
-        
-        console.log(`Network type availability: ${isNetworkTypeAvailable}`); // true or false
-
+        console.log(`Network type availability: ${isNetworkTypeAvailable}`);
         if (!isNetworkTypeAvailable) {
             return res.status(403).json({ message: "This network type is not available at the moment. Please try again later." });
         }
-        //Validate PIn
 
+        // Validate PIN
         if (pin !== req.user.transaction_pin) {
             console.log('Invalid PIN');
-
             return res.status(401).json({ message: "Invalid PIN" });
-            
         }
 
         // Validate input data
         const { error } = validatePurchaseData({ network, amount, phoneNumber });
         if (error) return res.status(400).json({ message: error.message });
 
-        // Enqueue the purchase job (Ensure `purchaseQueue` is properly imported and used)
+        
+        const allocatedMapping = await providers.getAllocatedProvider(plan.network, networkType);
+        if (!allocatedMapping) {
+            return res.status(400).json({ message: "No provider allocated for this network type." });
+        }
+
+        // From the plan's providers array, find the provider object that matches the allocated provider.
+        const providerDetails = plan.providers.find(
+            (p) => p.provider.toLowerCase() === allocatedMapping.provider.toLowerCase()
+        );
+
+        if (!providerDetails) {
+            return res.status(400).json({ message: "Allocated provider details not found in the plan." });
+        }
+        // ************************************************************
+
+        // Enqueue the purchase job (passing along the allocated provider details)
         const purchaseJob = await purchaseQueue.add('purchaseJob', {
             userId,
             network,
@@ -70,11 +77,12 @@ const purchaseData = async (req, res) => {
             phoneNumber,
             plan,
             amount,
+            allocatedProvider: providerDetails.provider,
         });
 
         return res.status(200).json({
             message: "Your purchase request has been queued and will be processed shortly.",
-            jobId: purchaseJob.id, // Pass the `jobId` back to the frontend
+            jobId: purchaseJob.id, // Pass the jobId back to the frontend
         });
     } catch (error) {
         console.error("Error queuing purchase request:", error);
@@ -84,6 +92,7 @@ const purchaseData = async (req, res) => {
         });
     }
 };
+
 
 const getStatus = async (req, res) => {
     try {

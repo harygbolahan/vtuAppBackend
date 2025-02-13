@@ -1,24 +1,22 @@
-const { Worker } = require('bullmq');
-const walletService = require('../services/walletServices');
-const dataService = require('./dataService');
-const Transaction = require('../models/generalModel');
-const Users = require('../User/userModels');
+const { Worker } = require("bullmq");
+const walletService = require("../services/walletServices");
+const dataService = require("./dataService");
+const Transaction = require("../models/generalModel");
+const Users = require("../User/userModels");
 
 const redisConfig = {
-    url: process.env.REDIS_URL,
-    maxRetriesPerRequest: null,
+  url: process.env.REDIS_URL,
+  maxRetriesPerRequest: null,
 };
-
-
 
 const worker = new Worker(
     'dataPurchaseQueue',
     async (job) => {
-        const { userId, network, networkType, phoneNumber, plan, amount } = job.data;
+        console.log('Job Data', job.data);
+        const { userId, network, networkType, phoneNumber, plan, amount, allocatedProvider } = job.data;
 
         const user = await Users.findById(userId);
         console.log('User', user);
-
 
         try {
             console.log(`Processing job ${job.id} for User: ${userId}`);
@@ -32,16 +30,47 @@ const worker = new Worker(
             // Step 2: Deduct wallet balance
             await walletService.deductAmount(userId, amount);
 
-            // Step 3: Call external API
-            const apiResponse = await dataService.purchaseDataFromExternalAPI({
-                network,
-                mobile_number: phoneNumber,
-                plan: plan.datahouse.planId,
-                Ported_number: true,
-            });
+            // Step 3: Retrieve allocated provider details from the plan's providers array
+            const allocatedProviderName = allocatedProvider; // e.g., "datahouse"
+            const providerDetails = plan.providers.find(
+                (p) => p.provider.toLowerCase() === allocatedProviderName.toLowerCase()
+            );
+            if (!providerDetails) {
+                throw new Error('Allocated provider details not found in the plan');
+            }
+
+            // Step 4: Call external API based on the allocated provider name
+            let apiResponse;
+            switch (allocatedProviderName.toLowerCase()) {
+                case 'datahouse':
+                    apiResponse = await dataService.purchaseDataFromExternalAPI({
+                        network,
+                        mobile_number: phoneNumber,
+                        plan: providerDetails.providerPlanId,
+                        Ported_number: true,
+                    });
+                    break;
+                case 'autopilot':
+                    apiResponse = await dataService.purchaseDataFromAutopilot({
+                        network,
+                        mobile_number: phoneNumber,
+                        plan: providerDetails.providerPlanId,
+                        Ported_number: true,
+                    });
+                    break;
+                case 'ogdams':
+                    apiResponse = await dataService.purchaseDataFromOgdams({
+                        network,
+                        mobile_number: phoneNumber,
+                        plan: providerDetails.providerPlanId,
+                        Ported_number: true,
+                    });
+                    break;
+                default:
+                    throw new Error('Provider not supported');
+            }
 
             console.log('Worker response', apiResponse);
-
 
             if (!apiResponse.data.Status || apiResponse.data.Status.toLowerCase() !== 'successful') {
                 // Refund wallet and log failure
@@ -49,7 +78,7 @@ const worker = new Worker(
                 throw new Error(apiResponse.api_response || 'Unknown error from external API');
             }
 
-            // Step 4: Log transaction as successful
+            // Step 5: Log transaction as successful
             await Transaction.create({
                 userID: userId,
                 network,
@@ -61,22 +90,18 @@ const worker = new Worker(
                 newBalance: user.walletBalance - amount,
                 serviceType: 'Data',
                 status: 'success',
-                description: ` ${networkType} ₦${amount} Data purchase for ${phoneNumber}`,
+                description: `${networkType} ₦${amount} Data purchase for ${phoneNumber}`,
                 externalTransactionId: apiResponse.id,
                 response: apiResponse.api_response,
             });
-
-            // Log the transaction
-
-            console.log('DataTransaction', Transaction);
-
 
             console.log(`Job ${job.id} completed successfully.`);
             return apiResponse; // Store full API response as job result
         } catch (error) {
             console.error(`Job ${job.id} failed: ${error.message}`);
 
-            //save transaction as failed
+            // Refund wallet and log failure
+            await walletService.refundAmount(userId, amount);
 
             await Transaction.create({
                 userID: userId,
@@ -89,9 +114,9 @@ const worker = new Worker(
                 newBalance: user.walletBalance,
                 serviceType: 'Data',
                 status: 'failed',
-                description: ` ${networkType} ₦${amount} Data purchase for ${phoneNumber}`,
+                description: `${networkType} ₦${amount} Data purchase for ${phoneNumber}`,
                 response: error.message,
-            })
+            });
 
             throw error; // Mark job as failed in BullMQ
         }
@@ -99,14 +124,13 @@ const worker = new Worker(
     { connection: redisConfig }
 );
 
-
 // Add event listeners for better monitoring
-worker.on('completed', (job) => {
-    console.log(`Job ${job.id} completed successfully.`);
+worker.on("completed", (job) => {
+  console.log(`Job ${job.id} completed successfully.`);
 });
 
-worker.on('failed', (job, err) => {
-    console.log(`Job ${job.id} failed with error: ${err.message}`);
+worker.on("failed", (job, err) => {
+  console.log(`Job ${job.id} failed with error: ${err.message}`);
 });
 
 module.exports = worker;

@@ -57,8 +57,8 @@ const dataPlanSchema = new mongoose.Schema(
 );
 
 // Indexes for faster queries
-dataPlanSchema.index({ network: 1, planName: 1 }); // For filtering by network and plan name
-dataPlanSchema.index({ "providers.provider": 1 }); // For filtering by provider
+dataPlanSchema.index({ network: 1, planName: 1 }); 
+dataPlanSchema.index({ "providers.provider": 1 }); 
 
 // Hide internal fields in API responses
 dataPlanSchema.set("toJSON", {
