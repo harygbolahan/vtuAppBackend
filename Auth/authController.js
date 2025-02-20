@@ -364,7 +364,7 @@ const setTransactionPin = async (req, res, next) => {
     if (!email || !transactionPin) {
       throw new AppError("Please provide all required fields", 404);
     }
-    const user = await Users.findOne({ email }).select("+transaction_pin");
+    const user = await Users.findOne({ email }).select("-bankDetails");
     if (!user) {
       throw new AppError("User with the email not found", 404);
     }

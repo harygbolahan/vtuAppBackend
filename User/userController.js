@@ -125,6 +125,41 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
+//update Pin
+
+const updatePin = async (req, res, next) => {
+  const userId = req.user._id;
+  const { oldPin, newPin } = req.body;
+
+  try {
+    const user = await Users.findById(userId);
+    if (!user) {
+      throw new AppError(`User not found with id of ${userId}`, 404);
+    }
+    const isMatch = await bcrypt.compare(oldPin, user.transaction_pin);
+    if (!isMatch) {
+      throw new AppError("Old pin is incorrect", 400);
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPin = await bcrypt.hash(newPin, salt);
+
+    user.transaction_pin = hashedPin;
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Pin updated successfully",
+      data: {
+        user,
+      }
+    })
+    } catch (error) {
+    next(error);
+    }
+
+}
+
 //update user status
 
 const updateUserStatus = async (req, res, next) => {
