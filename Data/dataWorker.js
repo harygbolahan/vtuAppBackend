@@ -96,6 +96,7 @@ const worker = new Worker(
             });
 
             console.log(`Job ${job.id} completed successfully.`);
+            
             return apiResponse; // Store full API response as job result
         } catch (error) {
             console.error(`Job ${job.id} failed: ${error.message}`);

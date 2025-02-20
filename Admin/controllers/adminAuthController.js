@@ -1,7 +1,7 @@
 const Users = require("../../User/userModels");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const signJWt = require("../../utils/SignJwt");
+const {signJWt} = require("../../utils/SignJwt");
 const sendEmail = require("../../utils/Email");
 const crypto = require("crypto");
 const AppError = require("../../utils/AppError");
@@ -33,6 +33,7 @@ const adminLogin = async (req, res, next) => {
 
     // Generate token if password is correct
     const token = signJWt(user._id);
+
     res.status(200).json({
       status: "success",
       message: "Admin logged in successfully",
