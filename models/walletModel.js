@@ -44,7 +44,7 @@ const walletSchema = new mongoose.Schema(
 );
 
 // Index userId for efficient querying
-walletSchema.index({ userId: 1 });
+// walletSchema.index({ userId: 1 });
 
 // Instance method to credit wallet
 walletSchema.methods.credit = async function (amount) {

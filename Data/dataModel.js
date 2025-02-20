@@ -6,7 +6,6 @@ const dataSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true, // Index for faster lookups
     },
     transactionId: {
       type: String,
